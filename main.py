@@ -17,7 +17,6 @@ class post_base(BaseModel):
 
 class user_base(BaseModel):
     username: str
-    
 
 
 def get_db():
@@ -26,6 +25,7 @@ def get_db():
         yield db
     finally:
         db.close()   
+
 
 db_dependency = Annotated[Session, Depends(get_db)]
 
@@ -54,6 +54,20 @@ async def read_post(post_id: int, db: db_dependency):
     if post is None:
         return HTTPException(status_code=404, detail="Post not found!")
     return post
+
+
+# update post
+@app.put('/post/{updated_post}', status_code=status.HTTP_200_OK, tags=["Post"])
+async def update_post(update_post: int, db: db_dependency, post_data: post_base):
+    update_post = db.query(model.Post).filter(model.Post.id == update_post).first()
+    if update_post is None:
+        return HTTPException(status_code=404, detail="Post not found!")
+    
+    update_post.title = post_data.title
+    update_post.content = post_data.content
+    update_post.user_id = post_data.user_id
+    db.commit()
+    return HTTPException(status_code=200, detail=post_data)
 
 
 # post delete by id
@@ -92,6 +106,17 @@ async def read_user(user_id: int, db: db_dependency):
         return HTTPException(status_code=404, detail="User not found!")
     return user
 
+
+# update user
+@app.put("/user/{update}", status_code=status.HTTP_200_OK, tags=["User"])
+async def update_user(update:int, db: db_dependency, user_data: user_base):
+    user = db.query(model.User).filter(model.User.id == model.User.id).first()
+    if update_user is None:
+        return HTTPException(status_code=400, detail="User not found!")
+    user.username = user_data.username
+    db.commit()
+    return HTTPException(status_code=200, detail=user_data)
+    
 
 # user delete by id
 @app.get("/users/{delete_user}", status_code=status.HTTP_200_OK, tags=["User"])
