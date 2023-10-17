@@ -108,9 +108,9 @@ async def read_user(user_id: int, db: db_dependency):
 
 
 # update user
-@app.put("/user/{update}", status_code=status.HTTP_200_OK, tags=["User"])
-async def update_user(update:int, db: db_dependency, user_data: user_base):
-    user = db.query(model.User).filter(model.User.id == model.User.id).first()
+@app.put("/user/{update_id}", status_code=status.HTTP_200_OK, tags=["User"])
+async def update_user(update_id:int, db: db_dependency, user_data: user_base):
+    user = db.query(model.User).filter(model.User.id == update_id).first()
     if update_user is None:
         return HTTPException(status_code=400, detail="User not found!")
     user.username = user_data.username
